@@ -1,10 +1,9 @@
 name: Setup New Workshop Repo
 
-# This action is triggered manually from the Actions tab
 on:
   workflow_dispatch:
-    # These are the form fields that will appear on GitHub
     inputs:
+      # ... your inputs are all correct ...
       workshop_code:
         description: 'The short code for the repo (e.g., INR_Mon-2510)'
         required: true
@@ -24,13 +23,15 @@ on:
         description: 'Faculty names, separated by commas'
         required: true
 
-
 jobs:
   replace-variables:
+    # --- ADD THIS SECTION ---
+    permissions:
+      contents: write
+    # ----------------------
     runs-on: ubuntu-latest
-
-    # Make the inputs available as environment variables for the whole job
     env:
+      # ... your env variables are all correct ...
       WORKSHOP_CODE: ${{ github.event.inputs.workshop_code }}
       WORKSHOP_NAME: ${{ github.event.inputs.workshop_name }}
       YEAR: ${{ github.event.inputs.year }}
@@ -39,19 +40,15 @@ jobs:
       FACULTY: ${{ github.event.inputs.faculty }}
 
     steps:
-      # Step 1: Check out the code from the repository
+      # ... all your steps are correct ...
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Rename the .Rproj file using the workshop_code input
       - name: Rename .Rproj file
         run: mv template.Rproj ${{ env.WORKSHOP_CODE }}.Rproj
 
-      # Step 3: Find and replace all placeholders in all files
       - name: Replace All Placeholders
         run: |
-          # This command finds all files (excluding .git folder) and runs a replacement for each variable.
-          # We use the pipe "|" as a separator to safely handle URLs and other special characters.
           find . -type f -not -path './.git/*' -exec sed -i \
             -e "s|{{WORKSHOP_CODE}}|${WORKSHOP_CODE}|g" \
             -e "s|{{WORKSHOP_NAME}}|${WORKSHOP_NAME}|g" \
@@ -61,7 +58,6 @@ jobs:
             -e "s|{{FACULTY}}|${FACULTY}|g" \
             {} +
 
-      # Step 4: Commit the changes back to the repository
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
