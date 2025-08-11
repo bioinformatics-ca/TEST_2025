@@ -3,7 +3,7 @@ name: Setup New Workshop Repo
 on:
   workflow_dispatch:
     inputs:
-      # ... your inputs are all correct ...
+      # ... your inputs ...
       workshop_code:
         description: 'The short code for the repo (e.g., INR_Mon-2510)'
         required: true
@@ -25,13 +25,11 @@ on:
 
 jobs:
   replace-variables:
-    # --- ADD THIS SECTION ---
     permissions:
       contents: write
-    # ----------------------
     runs-on: ubuntu-latest
     env:
-      # ... your env variables are all correct ...
+      # ... your env variables ...
       WORKSHOP_CODE: ${{ github.event.inputs.workshop_code }}
       WORKSHOP_NAME: ${{ github.event.inputs.workshop_name }}
       YEAR: ${{ github.event.inputs.year }}
@@ -40,7 +38,6 @@ jobs:
       FACULTY: ${{ github.event.inputs.faculty }}
 
     steps:
-      # ... all your steps are correct ...
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -49,7 +46,8 @@ jobs:
 
       - name: Replace All Placeholders
         run: |
-          find . -type f -not -path './.git/*' -exec sed -i \
+          # --- CHANGE: Added '-not -path "./.github/*"' to prevent the workflow from modifying itself ---
+          find . -type f -not -path './.git/*' -not -path './.github/*' -exec sed -i \
             -e "s|{{WORKSHOP_CODE}}|${WORKSHOP_CODE}|g" \
             -e "s|{{WORKSHOP_NAME}}|${WORKSHOP_NAME}|g" \
             -e "s|{{YEAR}}|${YEAR}|g" \
